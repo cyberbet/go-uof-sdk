@@ -24,10 +24,11 @@ const (
 	// at least two routing key patterns (e.g. “*.*.live.#” and “-.-.-.#”)
 	// because you are typically always interested in receiving the system
 	// messages that will come with a routing key starting with -.-.-
-	bindingKeyVirtuals = "*.virt.#"
-	bindingKeyPrematch = "*.pre.#"
-	bindingKeyLive     = "*.*.live.#"
-	bindingKeySystem   = "-.-.-.#"
+	bindingKeyVirtuals         = "*.virt.#"
+	bindingKeyPrematch         = "*.pre.#"
+	bindingKeyLive             = "*.*.live.#"
+	bindingKeySystem           = "-.-.-.#"
+	bindingKeyRecoveryTemplate = "*.*.*.*.*.*.*.%d"
 )
 
 const (
@@ -39,32 +40,32 @@ const (
 )
 
 // Dial connects to the queue chosen by environment
-func Dial(ctx context.Context, env uof.Environment, bookmakerID, token string, bind int8) (*Connection, error) {
+func Dial(ctx context.Context, env uof.Environment, bookmakerID, token string, bind int8, nodeID int) (*Connection, error) {
 	switch env {
 	case uof.Replay:
-		return DialReplay(ctx, bookmakerID, token, bind)
+		return DialReplay(ctx, bookmakerID, token, bind, nodeID)
 	case uof.Staging:
-		return DialStaging(ctx, bookmakerID, token, bind)
+		return DialStaging(ctx, bookmakerID, token, bind, nodeID)
 	case uof.Production:
-		return DialProduction(ctx, bookmakerID, token, bind)
+		return DialProduction(ctx, bookmakerID, token, bind, nodeID)
 	default:
 		return nil, uof.Notice("queue dial", fmt.Errorf("unknown environment %d", env))
 	}
 }
 
 // Dial connects to the production queue
-func DialProduction(ctx context.Context, bookmakerID, token string, bind int8) (*Connection, error) {
-	return dial(ctx, productionServer, bookmakerID, token, bind)
+func DialProduction(ctx context.Context, bookmakerID, token string, bind int8, nodeID int) (*Connection, error) {
+	return dial(ctx, productionServer, bookmakerID, token, bind, nodeID)
 }
 
 // DialStaging connects to the staging queue
-func DialStaging(ctx context.Context, bookmakerID, token string, bind int8) (*Connection, error) {
-	return dial(ctx, stagingServer, bookmakerID, token, bind)
+func DialStaging(ctx context.Context, bookmakerID, token string, bind int8, nodeID int) (*Connection, error) {
+	return dial(ctx, stagingServer, bookmakerID, token, bind, nodeID)
 }
 
 // DialReplay connects to the replay server
-func DialReplay(ctx context.Context, bookmakerID, token string, bind int8) (*Connection, error) {
-	return dial(ctx, replayServer, bookmakerID, token, bind)
+func DialReplay(ctx context.Context, bookmakerID, token string, bind int8, nodeID int) (*Connection, error) {
+	return dial(ctx, replayServer, bookmakerID, token, bind, nodeID)
 }
 
 type Connection struct {
@@ -106,7 +107,7 @@ func (c *Connection) drain(out chan<- *uof.Message, errc chan<- error) {
 	<-errsDone
 }
 
-func dial(ctx context.Context, server, bookmakerID, token string, bind int8) (*Connection, error) {
+func dial(ctx context.Context, server, bookmakerID, token string, bind int8, nodeID int) (*Connection, error) {
 	addr := fmt.Sprintf("amqps://%s:@%s//unifiedfeed/%s", token, server, bookmakerID)
 
 	var bindingKeys []string
@@ -123,13 +124,16 @@ func dial(ctx context.Context, server, bookmakerID, token string, bind int8) (*C
 		bindingKeys = []string{bindingKeyAll}
 	}
 
+	if nodeID != 0 {
+		bindingKeys = append(bindingKeys, fmt.Sprintf(bindingKeyRecoveryTemplate, nodeID))
+	}
+
 	tls := &tls.Config{
 		ServerName:         server,
 		InsecureSkipVerify: true,
 	}
 	conn, err := amqp.DialTLS(addr, tls)
 	if err != nil {
-		fmt.Println(addr)
 		return nil, uof.Notice("conn.Dial", err)
 	}
 
@@ -184,7 +188,7 @@ func dial(ctx context.Context, server, bookmakerID, token string, bind int8) (*C
 		msgs: msgs,
 		errs: errs,
 		reDial: func() (*Connection, error) {
-			return dial(ctx, server, bookmakerID, token, bind)
+			return dial(ctx, server, bookmakerID, token, bind, nodeID)
 		},
 	}
 

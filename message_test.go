@@ -46,7 +46,7 @@ func TestMessageParseRoutingKeys(t *testing.T) {
 					Priority: MessagePriorityHigh,
 					SportID:  7,
 					EventURN: "vf:match:12345",
-					EventID:  -3160336,
+					EventID:  12345,
 				},
 			},
 		},

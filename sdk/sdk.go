@@ -26,6 +26,7 @@ type Config struct {
 	BindPrematch bool
 	BindLive     bool
 	Languages    []uof.Lang
+	NodeID       int
 }
 
 // Option sets attributes on the Config.
@@ -108,11 +109,11 @@ func connect(ctx context.Context, c Config) (*queue.Connection, *api.API, error)
 	if c.BindLive {
 		bind = queue.BindLive
 	}
-	conn, err := queue.Dial(ctx, c.Env, c.BookmakerID, c.Token, bind)
+	conn, err := queue.Dial(ctx, c.Env, c.BookmakerID, c.Token, bind, c.NodeID)
 	if err != nil {
 		return nil, nil, err
 	}
-	stg, err := api.Dial(ctx, c.Env, c.Token)
+	stg, err := api.Dial(ctx, c.Env, c.Token, c.NodeID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -180,6 +181,13 @@ func Replay(cb func(*api.ReplayAPI) error) Option {
 	return func(c *Config) {
 		c.Env = uof.Replay
 		c.Replay = cb
+	}
+}
+
+// RecoveryNodeID set nodeID for recovery requests and bind to recovery queue.
+func RecoveryNodeID(nodeID int) Option {
+	return func(c *Config) {
+		c.NodeID = nodeID
 	}
 }
 

@@ -25,38 +25,41 @@ type API struct {
 	server  string
 	token   string
 	exitSig context.Context
+	nodeID  int
 }
 
 // Dial connect to the staging or production api environment
-func Dial(ctx context.Context, env uof.Environment, token string) (*API, error) {
+func Dial(ctx context.Context, env uof.Environment, token string, nodeID int) (*API, error) {
 	switch env {
 	case uof.Replay:
-		return Staging(ctx, token)
+		return Staging(ctx, token, nodeID)
 	case uof.Staging:
-		return Staging(ctx, token)
+		return Staging(ctx, token, nodeID)
 	case uof.Production:
-		return Production(ctx, token)
+		return Production(ctx, token, nodeID)
 	default:
 		return nil, uof.Notice("queue dial", fmt.Errorf("unknown environment %d", env))
 	}
 }
 
 // Staging connects to the staging system
-func Staging(exitSig context.Context, token string) (*API, error) {
+func Staging(exitSig context.Context, token string, nodeID int) (*API, error) {
 	a := &API{
 		server:  stagingServer,
 		token:   token,
 		exitSig: exitSig,
+		nodeID:  nodeID,
 	}
 	return a, a.Ping()
 }
 
 // Production connects to the production system
-func Production(exitSig context.Context, token string) (*API, error) {
+func Production(exitSig context.Context, token string, nodeID int) (*API, error) {
 	a := &API{
 		server:  productionServer,
 		token:   token,
 		exitSig: exitSig,
+		nodeID:  nodeID,
 	}
 	return a, a.Ping()
 }
@@ -135,6 +138,9 @@ func (a *API) post(tpl string, p *params) error {
 func (a *API) httpRequest(tpl string, p *params, method string) ([]byte, error) {
 	path := runTemplate(tpl, p)
 	url := fmt.Sprintf("https://%s%s", a.server, path)
+	if a.nodeID != 0 {
+		url = fmt.Sprintf("%s&node_id=%d", url, a.nodeID)
+	}
 
 	req, err := retryablehttp.NewRequest(method, url, nil)
 	if err != nil {
