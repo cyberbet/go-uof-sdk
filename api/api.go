@@ -65,9 +65,11 @@ func Production(exitSig context.Context, token string, nodeID int) (*API, error)
 }
 
 const (
-	recovery     = "/v1/{{.Producer}}/recovery/initiate_request?after={{.Timestamp}}&request_id={{.RequestID}}"
-	fullRecovery = "/v1/{{.Producer}}/recovery/initiate_request?request_id={{.RequestID}}"
-	ping         = "/v1/users/whoami.xml"
+	recovery         = "/v1/{{.Producer}}/recovery/initiate_request?after={{.Timestamp}}&request_id={{.RequestID}}"
+	recoveryNode     = "/v1/{{.Producer}}/recovery/initiate_request?after={{.Timestamp}}&request_id={{.RequestID}}&node_id={{.NodeID}}"
+	fullRecovery     = "/v1/{{.Producer}}/recovery/initiate_request?request_id={{.RequestID}}"
+	fullRecoveryNode = "/v1/{{.Producer}}/recovery/initiate_request?request_id={{.RequestID}}&node_id={{.NodeID}}"
+	ping             = "/v1/users/whoami.xml"
 )
 
 func (a *API) RequestRecovery(producer uof.Producer, timestamp int, requestID int) error {
@@ -80,13 +82,19 @@ func (a *API) RequestRecovery(producer uof.Producer, timestamp int, requestID in
 // RequestRecoverySinceTimestamp does recovery of odds and stateful messages
 // over the feed since after timestamp. Subscribes client to feed messages.
 func (a *API) RequestRecoverySinceTimestamp(producer uof.Producer, timestamp int, requestID int) error {
-	return a.post(recovery, &params{Producer: producer, Timestamp: timestamp, RequestID: requestID})
+	if a.nodeID == 0 {
+		return a.post(recovery, &params{Producer: producer, Timestamp: timestamp, RequestID: requestID})
+	}
+	return a.post(recoveryNode, &params{Producer: producer, Timestamp: timestamp, RequestID: requestID})
 }
 
 // RequestFullOddsRecovery does recovery of odds over the feed. Subscribes
 // client to feed messages.
 func (a *API) RequestFullOddsRecovery(producer uof.Producer, requestID int) error {
-	return a.post(fullRecovery, &params{Producer: producer, RequestID: requestID})
+	if a.nodeID == 0 {
+		return a.post(fullRecovery, &params{Producer: producer, RequestID: requestID})
+	}
+	return a.post(fullRecoveryNode, &params{Producer: producer, RequestID: requestID})
 }
 
 // // RecoverSportEvent requests to resend all odds for all markets for a sport
@@ -138,9 +146,6 @@ func (a *API) post(tpl string, p *params) error {
 func (a *API) httpRequest(tpl string, p *params, method string) ([]byte, error) {
 	path := runTemplate(tpl, p)
 	url := fmt.Sprintf("https://%s%s", a.server, path)
-	if a.nodeID != 0 {
-		url = fmt.Sprintf("%s&node_id=%d", url, a.nodeID)
-	}
 
 	req, err := retryablehttp.NewRequest(method, url, nil)
 	if err != nil {
