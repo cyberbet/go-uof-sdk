@@ -85,7 +85,7 @@ func (a *API) RequestRecoverySinceTimestamp(producer uof.Producer, timestamp int
 	if a.nodeID == 0 {
 		return a.post(recovery, &params{Producer: producer, Timestamp: timestamp, RequestID: requestID})
 	}
-	return a.post(recoveryNode, &params{Producer: producer, Timestamp: timestamp, RequestID: requestID})
+	return a.post(recoveryNode, &params{Producer: producer, Timestamp: timestamp, RequestID: requestID, NodeID: a.nodeID})
 }
 
 // RequestFullOddsRecovery does recovery of odds over the feed. Subscribes
@@ -94,7 +94,7 @@ func (a *API) RequestFullOddsRecovery(producer uof.Producer, requestID int) erro
 	if a.nodeID == 0 {
 		return a.post(fullRecovery, &params{Producer: producer, RequestID: requestID})
 	}
-	return a.post(fullRecoveryNode, &params{Producer: producer, RequestID: requestID})
+	return a.post(fullRecoveryNode, &params{Producer: producer, RequestID: requestID, NodeID: a.nodeID})
 }
 
 // // RecoverSportEvent requests to resend all odds for all markets for a sport
@@ -198,6 +198,7 @@ type params struct {
 	UseReplayTimestamp bool
 	Lang               uof.Lang
 	Producer           uof.Producer
+	NodeID             int
 }
 
 func runTemplate(def string, p *params) string {
