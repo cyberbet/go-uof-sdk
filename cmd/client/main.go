@@ -72,7 +72,6 @@ func main() {
 
 	err := sdk.Run(exitSignal(),
 		sdk.Credentials(bookmakerID, token),
-		sdk.Staging(),
 		sdk.Recovery(pc),
 		sdk.BindSports(),
 		sdk.Fixtures(preloadTo),

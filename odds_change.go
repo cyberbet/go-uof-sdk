@@ -52,7 +52,7 @@ type OddsGenerationProperties struct {
 type Market struct {
 	ID            int               `xml:"id,attr" json:"id"`
 	LineID        int               `json:"lineID"`
-	Specifiers    map[string]string `json:"sepcifiers,omitempty"`
+	Specifiers    map[string]string `json:"specifiers,omitempty"`
 	Status        MarketStatus      `xml:"status,attr,omitempty" json:"status,omitempty"`
 	CashoutStatus *CashoutStatus    `xml:"cashout_status,attr,omitempty" json:"cashoutStatus,omitempty"`
 	// If present, this is set to 1, which states that this is the most balanced
