@@ -72,22 +72,26 @@ type Group struct {
 
 type Tournament struct {
 	ID   int    `json:"id"`
+	URN  URN    `json:"urn"`
 	Name string `xml:"name,attr" json:"name"`
 }
 
 type Sport struct {
 	ID   int    `json:"id"`
+	URN  URN    `json:"urn"`
 	Name string `xml:"name,attr" json:"name"`
 }
 
 type Category struct {
 	ID          int    `json:"id"`
+	URN         URN    `json:"urn"`
 	Name        string `xml:"name,attr" json:"name"`
 	CountryCode string `xml:"country_code,attr,omitempty" json:"countryCode,omitempty"`
 }
 
 type Competitor struct {
 	ID           int                `json:"id"`
+	URN          URN                `json:"urn"`
 	Qualifier    string             `xml:"qualifier,attr,omitempty" json:"qualifier,omitempty"`
 	Name         string             `xml:"name,attr" json:"name"`
 	Abbreviation string             `xml:"abbreviation,attr" json:"abbreviation"`
@@ -100,6 +104,7 @@ type Competitor struct {
 
 type CompetitorPlayer struct {
 	ID           int    `json:"id"`
+	URN          URN    `json:"urn"`
 	Name         string `xml:"name,attr" json:"name"`
 	Abbreviation string `xml:"abbreviation,attr" json:"abbreviation"`
 	Nationality  string `xml:"nationality,attr,omitempty" json:"nationality,omitempty"`
@@ -145,6 +150,7 @@ type Round struct {
 
 type Season struct {
 	ID        int    `json:"id"`
+	URN       URN    `json:"urn"`
 	StartDate string `xml:"start_date,attr" json:"startDate"`
 	EndDate   string `xml:"end_date,attr" json:"endDate"`
 	StartTime string `xml:"start_time,attr,omitempty" json:"startTime,omitempty"`
@@ -230,6 +236,7 @@ func (f *Fixture) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	f.Sport = overlay.Tournament.Sport
 	f.Category = overlay.Tournament.Category
 	f.Tournament.ID = overlay.Tournament.URN.ID()
+	f.Tournament.URN = overlay.Tournament.URN
 	f.Tournament.Name = overlay.Tournament.Name
 
 	for _, c := range f.Competitors {
@@ -254,6 +261,7 @@ func (t *Sport) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 		return err
 	}
 	t.ID = overlay.URN.ID()
+	t.URN = overlay.URN
 	return nil
 }
 
@@ -268,6 +276,7 @@ func (t *Category) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 		return err
 	}
 	t.ID = overlay.URN.ID()
+	t.URN = overlay.URN
 	return nil
 }
 
@@ -282,6 +291,7 @@ func (t *Season) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 		return err
 	}
 	t.ID = overlay.URN.ID()
+	t.URN = overlay.URN
 	return nil
 }
 
@@ -310,6 +320,7 @@ func (t *Competitor) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error 
 		return err
 	}
 	t.ID = overlay.URN.ID()
+	t.URN = overlay.URN
 	return nil
 }
 
@@ -324,6 +335,7 @@ func (t *CompetitorPlayer) UnmarshalXML(d *xml.Decoder, start xml.StartElement) 
 		return err
 	}
 	t.ID = overlay.URN.ID()
+	t.URN = overlay.URN
 	return nil
 }
 
@@ -346,6 +358,7 @@ func (t *FixtureTournament) UnmarshalXML(d *xml.Decoder, start xml.StartElement)
 		t.Sport = overlay.Tournament.Sport
 		t.Category = overlay.Tournament.Category
 		t.Tournament.ID = overlay.Tournament.URN.ID()
+		t.Tournament.URN = overlay.Tournament.URN
 		t.Tournament.Name = overlay.Tournament.Name
 		t.ID = overlay.Tournament.URN.ID()
 		t.URN = overlay.Tournament.URN
