@@ -305,14 +305,19 @@ func TestFixture(t *testing.T) {
 
 	assert.Equal(t, "Soccer", f.Sport.Name)
 	assert.Equal(t, 1, f.Sport.ID)
+	assert.Equal(t, "sr:sport:1", f.Sport.URN.String())
 	assert.Equal(t, "International Clubs", f.Category.Name)
 	assert.Equal(t, 393, f.Category.ID)
+	assert.Equal(t, "sr:category:393", f.Category.URN.String())
 	assert.Equal(t, "UEFA Champions League", f.Tournament.Name)
 	assert.Equal(t, 7, f.Tournament.ID)
+	assert.Equal(t, "sr:tournament:7", f.Tournament.URN.String())
 	assert.Equal(t, "Ajax Amsterdam - Tottenham Hotspur                                                         08.05. 19:00          closed", f.PP())
 
 	assert.Equal(t, 2953, f.Home.ID)
+	assert.Equal(t, "sr:competitor:2953", f.Home.URN.String())
 	assert.Equal(t, 33, f.Away.ID)
+	assert.Equal(t, "sr:competitor:33", f.Away.URN.String())
 
 	// <extra_info>
 	// 	<info key="neutral_ground" value="false"/>
@@ -344,6 +349,7 @@ func TestFixutreWithPlayers(t *testing.T) {
 	assert.Len(t, msg.Fixture.Competitors[0].Players, 2)
 	assert.Len(t, msg.Fixture.Competitors[1].Players, 2)
 	assert.Equal(t, "Goldhoff, George", msg.Fixture.Competitors[1].Players[0].Name)
+	assert.Equal(t, "sr:competitor:92845", msg.Fixture.Competitors[1].Players[0].URN.String())
 }
 
 func TestFixtureTournament(t *testing.T) {
@@ -357,7 +363,9 @@ func TestFixtureTournament(t *testing.T) {
 	assert.Equal(t, 13933, ft.ID)
 	assert.Equal(t, "vf:tournament:13933", string(ft.URN))
 	assert.Equal(t, 1111, ft.Category.ID)
+	assert.Equal(t, "sr:category:1111", ft.Category.URN.String())
 	assert.Equal(t, 13933, ft.Tournament.ID)
+	assert.Equal(t, "vf:tournament:13933", ft.Tournament.URN.String())
 	assert.Len(t, ft.Groups, 6)
 	assert.Len(t, ft.Groups[0].Competitors, 4)
 	assert.Equal(t, "Jamaica", ft.Groups[0].Competitors[2].Name)
