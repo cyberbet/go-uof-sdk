@@ -13,7 +13,6 @@ import (
 	_ "net/http/pprof"
 
 	"github.com/minus5/go-uof-sdk"
-	"github.com/minus5/go-uof-sdk/api"
 	"github.com/minus5/go-uof-sdk/pipe"
 	"github.com/minus5/go-uof-sdk/sdk"
 )
@@ -88,21 +87,11 @@ func main() {
 		sdk.Languages(uof.Languages("en,de,hr")),
 		sdk.BufferedConsumer(pipe.FileStore(outputFolder), 1024),
 		sdk.Callback(progress),
-		sdk.Replay(startReplay),
+		sdk.Replay(),
 	)
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func startReplay(rpl *api.ReplayAPI) error {
-	if !eventURN.Empty() {
-		return rpl.StartEvent(eventURN, speed, maxDelay)
-	}
-	if scenarioID > 0 {
-		return rpl.StartScenario(scenarioID, speed, maxDelay)
-	}
-	return nil
 }
 
 func progress(m *uof.Message) error {

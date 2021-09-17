@@ -16,6 +16,8 @@ const (
 	pathCompetitor    = "/v1/sports/{{.Lang}}/competitors/sr:competitor:{{.PlayerID}}/profile.xml"
 	events            = "/v1/sports/{{.Lang}}/schedules/pre/schedule.xml?start={{.Start}}&limit={{.Limit}}"
 	liveEvents        = "/v1/sports/{{.Lang}}/schedules/live/schedule.xml"
+	replayFixture     = "/v1/replay/sports/{{.Lang}}/sport_events/{{.EventURN}}/fixture.xml"
+	replaySummary     = "/v1/replay/sports/{{.Lang}}/sport_events/{{.EventURN}}/summary.xml"
 )
 
 // Markets all currently available markets for a language
@@ -32,17 +34,28 @@ func (a *API) MarketVariant(lang uof.Lang, marketID int, variant string) (uof.Ma
 // Fixture lists the fixture for a specified sport event
 func (a *API) Fixture(lang uof.Lang, eventURN uof.URN) (*uof.Fixture, error) {
 	var fr fixtureRsp
+	if a.env == uof.Replay {
+		return &fr.Fixture, a.getAs(&fr, replayFixture, &params{Lang: lang, EventURN: eventURN})
+
+	}
 	return &fr.Fixture, a.getAs(&fr, pathFixture, &params{Lang: lang, EventURN: eventURN})
+
 }
 
-// Fixture with extra information
+// Summary with extra information
 func (a *API) Summary(lang uof.Lang, eventURN uof.URN) (*uof.Summary, error) {
 	var s uof.Summary
+	if a.env == uof.Replay {
+		return &s, a.getAs(&s, replaySummary, &params{Lang: lang, EventURN: eventURN})
+	}
 	return &s, a.getAs(&s, pathSummary, &params{Lang: lang, EventURN: eventURN})
 }
 
 func (a *API) Tournament(lang uof.Lang, eventURN uof.URN) (*uof.FixtureTournament, error) {
 	var ft uof.FixtureTournament
+	if a.env == uof.Replay {
+		return &ft, a.getAs(&ft, replayFixture, &params{Lang: lang, EventURN: eventURN})
+	}
 	return &ft, a.getAs(&ft, pathFixture, &params{Lang: lang, EventURN: eventURN})
 }
 

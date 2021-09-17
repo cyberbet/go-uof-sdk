@@ -22,6 +22,7 @@ const (
 var RequestTimeout = 32 * time.Second
 
 type API struct {
+	env     uof.Environment
 	server  string
 	token   string
 	exitSig context.Context
@@ -32,7 +33,7 @@ type API struct {
 func Dial(ctx context.Context, env uof.Environment, token string, nodeID int) (*API, error) {
 	switch env {
 	case uof.Replay:
-		return Staging(ctx, token, nodeID)
+		return Replay(ctx, token, nodeID)
 	case uof.Staging:
 		return Staging(ctx, token, nodeID)
 	case uof.Production:
@@ -42,9 +43,22 @@ func Dial(ctx context.Context, env uof.Environment, token string, nodeID int) (*
 	}
 }
 
+// Replay connects to the replay system
+func Replay(exitSig context.Context, token string, nodeID int) (*API, error) {
+	a := &API{
+		env:     uof.Replay,
+		server:  stagingServer,
+		token:   token,
+		exitSig: exitSig,
+		nodeID:  nodeID,
+	}
+	return a, a.Ping()
+}
+
 // Staging connects to the staging system
 func Staging(exitSig context.Context, token string, nodeID int) (*API, error) {
 	a := &API{
+		env:     uof.Staging,
 		server:  stagingServer,
 		token:   token,
 		exitSig: exitSig,
@@ -56,6 +70,7 @@ func Staging(exitSig context.Context, token string, nodeID int) (*API, error) {
 // Production connects to the production system
 func Production(exitSig context.Context, token string, nodeID int) (*API, error) {
 	a := &API{
+		env:     uof.Production,
 		server:  productionServer,
 		token:   token,
 		exitSig: exitSig,

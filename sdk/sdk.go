@@ -18,7 +18,6 @@ type Config struct {
 	Fixtures     time.Time
 	Recovery     []uof.ProducerChange
 	Stages       []pipe.InnerStage
-	Replay       func(*api.ReplayAPI) error
 	Env          uof.Environment
 	Staging      bool
 	BindVirtuals bool
@@ -42,15 +41,6 @@ func Run(ctx context.Context, options ...Option) error {
 	qc, apiConn, err := connect(ctx, c)
 	if err != nil {
 		return err
-	}
-	if c.Replay != nil {
-		rpl, err := api.Replay(ctx, c.Token)
-		if err != nil {
-			return err
-		}
-		if err := c.Replay(rpl); err != nil {
-			return err
-		}
 	}
 
 	stages := []pipe.InnerStage{
@@ -177,10 +167,9 @@ func BindPrematch() Option {
 
 // Replay forces use of replay environment.
 // Callback will be called to start replay after establishing connection.
-func Replay(cb func(*api.ReplayAPI) error) Option {
+func Replay() Option {
 	return func(c *Config) {
 		c.Env = uof.Replay
-		c.Replay = cb
 	}
 }
 
