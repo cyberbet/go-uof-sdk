@@ -47,7 +47,7 @@ func Dial(ctx context.Context, env uof.Environment, token string, nodeID int) (*
 func Replay(exitSig context.Context, token string, nodeID int) (*API, error) {
 	a := &API{
 		env:     uof.Replay,
-		server:  stagingServer,
+		server:  productionServer,
 		token:   token,
 		exitSig: exitSig,
 		nodeID:  nodeID,
