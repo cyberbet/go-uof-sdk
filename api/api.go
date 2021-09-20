@@ -80,11 +80,12 @@ func Production(exitSig context.Context, token string, nodeID int) (*API, error)
 }
 
 const (
-	recovery         = "/v1/{{.Producer}}/recovery/initiate_request?after={{.Timestamp}}&request_id={{.RequestID}}"
-	recoveryNode     = "/v1/{{.Producer}}/recovery/initiate_request?after={{.Timestamp}}&request_id={{.RequestID}}&node_id={{.NodeID}}"
-	fullRecovery     = "/v1/{{.Producer}}/recovery/initiate_request?request_id={{.RequestID}}"
-	fullRecoveryNode = "/v1/{{.Producer}}/recovery/initiate_request?request_id={{.RequestID}}&node_id={{.NodeID}}"
-	ping             = "/v1/users/whoami.xml"
+	recovery          = "/v1/{{.Producer}}/recovery/initiate_request?after={{.Timestamp}}&request_id={{.RequestID}}"
+	recoveryNode      = "/v1/{{.Producer}}/recovery/initiate_request?after={{.Timestamp}}&request_id={{.RequestID}}&node_id={{.NodeID}}"
+	fullRecovery      = "/v1/{{.Producer}}/recovery/initiate_request?request_id={{.RequestID}}"
+	fullRecoveryNode  = "/v1/{{.Producer}}/recovery/initiate_request?request_id={{.RequestID}}&node_id={{.NodeID}}"
+	recoveryEventNode = "/v1/{{.Producer}}/odds/events/{{.EventURN}}/initiate_request?request_id={{.RequestID}}&node_id={{.NodeID}}"
+	ping              = "/v1/users/whoami.xml"
 )
 
 func (a *API) RequestRecovery(producer uof.Producer, timestamp int, requestID int) error {
@@ -112,11 +113,11 @@ func (a *API) RequestFullOddsRecovery(producer uof.Producer, requestID int) erro
 	return a.post(fullRecoveryNode, &params{Producer: producer, RequestID: requestID, NodeID: a.nodeID})
 }
 
-// // RecoverSportEvent requests to resend all odds for all markets for a sport
-// // event.
-// func (a *Api) RecoverSportEvent(product, eventID string) error {
-// 	return a.post(fmt.Sprintf("/v1/%s/events/%s/initiate_request", product, eventID))
-// }
+// RequestSportEventRecovery requests to resend all odds for all markets for a sport
+// event.
+func (a *API) RequestSportEventRecovery(producer uof.Producer, eventURN uof.URN, requestID int) error {
+	return a.post(recoveryEventNode, &params{EventURN: eventURN, Producer: producer, RequestID: requestID, NodeID: a.nodeID})
+}
 
 // // RecoverStatefulForSportEvent requests to resend all stateful-messages
 // // (BetSettlement, RollbackBetSettlement, BetCancel, UndoBetCancel) for a sport
