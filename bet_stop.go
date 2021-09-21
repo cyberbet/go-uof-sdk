@@ -16,14 +16,15 @@ import (
 // moved to suspended. However, if the market is already deactivated, settled or
 // cancelled this is not a good practice. Only move ACTIVE markets to suspended.
 type BetStop struct {
-	EventID   int          `json:"eventID"`
-	EventURN  URN          `xml:"event_id,attr" json:"eventURN"`
-	Timestamp int          `xml:"timestamp,attr" json:"timestamp"`
-	RequestID *int         `xml:"request_id,attr,omitempty" json:"requestID,omitempty"`
-	Groups    []string     `json:"groups"`
-	MarketIDs []int        `json:"marketsIDs"`
-	Producer  Producer     `xml:"product,attr" json:"producer"`
-	Status    MarketStatus `json:"status,omitempty"`
+	EventID       int          `json:"eventID"`
+	EventURN      URN          `xml:"event_id,attr" json:"eventURN"`
+	Timestamp     int          `xml:"timestamp,attr" json:"timestamp"`
+	RequestID     *int         `xml:"request_id,attr,omitempty" json:"requestID,omitempty"`
+	Groups        []string     `json:"groups"`
+	MarketIDs     []int        `json:"marketsIDs"`
+	Producer      Producer     `xml:"product,attr" json:"producer"`
+	Status        MarketStatus `json:"status,omitempty"`
+	BetStopReason *int         `xml:"betstop_reason,attr,omitempty" json:"betstop_reason"`
 }
 
 func (t *BetStop) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
