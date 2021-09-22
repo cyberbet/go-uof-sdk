@@ -67,10 +67,17 @@ func (f *fixture) eventURN(m *uof.Message) uof.URN {
 	if m.Producer.Virtuals() && m.Is(uof.MessageTypeOddsChange) {
 		return m.EventURN
 	}
-	if m.Type != uof.MessageTypeFixtureChange || m.FixtureChange == nil {
-		return uof.NoURN
+	switch m.Type {
+	case uof.MessageTypeFixtureChange:
+		if m.FixtureChange != nil {
+			return m.FixtureChange.EventURN
+		}
+	case uof.MessageTypeBetStop:
+		if m.BetStop != nil {
+			return m.BetStop.EventURN
+		}
 	}
-	return m.FixtureChange.EventURN
+	return uof.NoURN
 }
 
 // returns list of fixture changes urns appeared in 'in' during preload
