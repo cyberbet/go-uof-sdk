@@ -81,7 +81,7 @@ func (t *BetSettlementMarket) UnmarshalXML(d *xml.Decoder, start xml.StartElemen
 	if err := d.DecodeElement(&overlay, &start); err != nil {
 		return err
 	}
-	t.Specifiers = toSpecifiers(overlay.Specifiers, overlay.ExtendedSpecifiers)
+	t.Specifiers = toSpecifiers(overlay.Specifiers)
 	t.LineID = toLineID(overlay.Specifiers)
 	return nil
 }

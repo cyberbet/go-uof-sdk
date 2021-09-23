@@ -106,8 +106,7 @@ func testOddsChangeSpecifiers(t *testing.T, oc *OddsChange) {
 
 	// <market id="123" specifiers="set=2|game=3|point=1" extended_specifiers="pero=2" status="-1">
 	s = oc.Markets[3].Specifiers
-	assert.Equal(t, 4, len(s))
-	assert.Equal(t, "2", s["pero"])
+	assert.Equal(t, 3, len(s))
 	assert.Equal(t, "2", s["set"])
 	assert.Equal(t, "3", s["game"])
 	assert.Equal(t, "1", s["point"])
@@ -126,28 +125,25 @@ func testOddsChangeSpecifiers(t *testing.T, oc *OddsChange) {
 
 func TestSpecifiersParsing(t *testing.T) {
 	data := []struct {
-		specifiers        string
-		extendedSpecifers string
-		specifiersMap     map[string]string
-		variantSpecifier  string
+		specifiers       string
+		specifiersMap    map[string]string
+		variantSpecifier string
 	}{
 		{
 			specifiers:    "total=1.5|from=1|to=15",
 			specifiersMap: map[string]string{"total": "1.5", "from": "1", "to": "15"},
 		},
 		{
-			specifiers:        "total=1.5|from=1",
-			extendedSpecifers: "to=15",
-			specifiersMap:     map[string]string{"total": "1.5", "from": "1", "to": "15"},
+			specifiers:    "total=1.5|from=1",
+			specifiersMap: map[string]string{"total": "1.5", "from": "1"},
 		},
 		{
-			extendedSpecifers: "to=15",
-			specifiersMap:     map[string]string{"to": "15"},
+			specifiers:    "to=15",
+			specifiersMap: map[string]string{"to": "15"},
 		},
 		{
-			specifiers:        "from=1",
-			extendedSpecifers: "||",
-			specifiersMap:     map[string]string{"from": "1"},
+			specifiers:    "from=1",
+			specifiersMap: map[string]string{"from": "1"},
 		},
 
 		{
@@ -166,7 +162,7 @@ func TestSpecifiersParsing(t *testing.T) {
 		},
 	}
 	for i, d := range data {
-		s := toSpecifiers(d.specifiers, d.extendedSpecifers)
+		s := toSpecifiers(d.specifiers)
 		assert.Equal(t, len(d.specifiersMap), len(s))
 		m := Market{Specifiers: d.specifiersMap}
 		assert.Equal(t, d.variantSpecifier, m.VariantSpecifier())

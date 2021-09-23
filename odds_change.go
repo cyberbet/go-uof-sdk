@@ -50,11 +50,12 @@ type OddsGenerationProperties struct {
 // LineID is hash of specifier field used to uniquely identify lines in one market.
 // One market line is uniquely identified by market id and line id.
 type Market struct {
-	ID            int               `xml:"id,attr" json:"id"`
-	LineID        int               `json:"lineID"`
-	Specifiers    map[string]string `json:"specifiers,omitempty"`
-	Status        MarketStatus      `xml:"status,attr,omitempty" json:"status,omitempty"`
-	CashoutStatus *CashoutStatus    `xml:"cashout_status,attr,omitempty" json:"cashoutStatus,omitempty"`
+	ID                 int               `xml:"id,attr" json:"id"`
+	LineID             int               `json:"lineID"`
+	Specifiers         map[string]string `json:"specifiers,omitempty"`
+	ExtendedSpecifiers map[string]string `json:"extendedSpecifiers,omitempty"`
+	Status             MarketStatus      `xml:"status,attr,omitempty" json:"status,omitempty"`
+	CashoutStatus      *CashoutStatus    `xml:"cashout_status,attr,omitempty" json:"cashoutStatus,omitempty"`
 	// If present, this is set to 1, which states that this is the most balanced
 	// or recommended market line. This setting makes most sense for markets where
 	// multiple lines are provided (e.g. the Totals market).
@@ -127,7 +128,8 @@ func (m *Market) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	if overlay.Status != nil {
 		m.Status = MarketStatus(*overlay.Status)
 	}
-	m.Specifiers = toSpecifiers(overlay.Specifiers, overlay.ExtendedSpecifiers)
+	m.Specifiers = toSpecifiers(overlay.Specifiers)
+	m.ExtendedSpecifiers = toSpecifiers(overlay.ExtendedSpecifiers)
 	m.LineID = toLineID(overlay.Specifiers)
 	if overlay.MarketMetadata != nil {
 		m.NextBetstop = overlay.MarketMetadata.NextBetstop
@@ -160,16 +162,12 @@ func (m Market) VariantSpecifier() string {
 	return ""
 }
 
-func toSpecifiers(specifiers, extendedSpecifiers string) map[string]string {
-	allSpecifiers := specifiers
-	if extendedSpecifiers != "" {
-		allSpecifiers = allSpecifiers + "|" + extendedSpecifiers
-	}
-	if len(allSpecifiers) < 2 {
+func toSpecifiers(specifiers string) map[string]string {
+	if len(specifiers) < 2 {
 		return nil
 	}
 	sm := make(map[string]string)
-	for _, s := range strings.Split(allSpecifiers, "|") {
+	for _, s := range strings.Split(specifiers, "|") {
 		if p := strings.Split(s, "="); len(p) == 2 {
 			k := p[0]
 			v := p[1]
