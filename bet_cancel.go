@@ -24,9 +24,10 @@ type BetCancel struct {
 }
 
 type BetCancelMarket struct {
-	ID         int  `xml:"id,attr" json:"id"`
-	LineID     int  `json:"lineID"`
-	VoidReason *int `xml:"void_reason,attr,omitempty" json:"voidReason,omitempty"`
+	ID         int               `xml:"id,attr" json:"id"`
+	LineID     int               `json:"lineID"`
+	Specifiers map[string]string `json:"specifiers,omitempty"`
+	VoidReason *int              `xml:"void_reason,attr,omitempty" json:"voidReason,omitempty"`
 }
 
 // A Rollback_bet_cancel message is sent when a previous bet cancel should be
@@ -71,6 +72,7 @@ func (t *BetCancelMarket) UnmarshalXML(d *xml.Decoder, start xml.StartElement) e
 		return err
 	}
 	t.LineID = toLineID(overlay.Specifiers)
+	t.Specifiers = toSpecifiers(overlay.Specifiers)
 	return nil
 }
 
