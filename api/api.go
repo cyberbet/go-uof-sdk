@@ -80,12 +80,13 @@ func Production(exitSig context.Context, token string, nodeID int) (*API, error)
 }
 
 const (
-	recovery          = "/v1/{{.Producer}}/recovery/initiate_request?after={{.Timestamp}}&request_id={{.RequestID}}"
-	recoveryNode      = "/v1/{{.Producer}}/recovery/initiate_request?after={{.Timestamp}}&request_id={{.RequestID}}&node_id={{.NodeID}}"
-	fullRecovery      = "/v1/{{.Producer}}/recovery/initiate_request?request_id={{.RequestID}}"
-	fullRecoveryNode  = "/v1/{{.Producer}}/recovery/initiate_request?request_id={{.RequestID}}&node_id={{.NodeID}}"
-	recoveryEventNode = "/v1/{{.Producer}}/odds/events/{{.EventURN}}/initiate_request?request_id={{.RequestID}}&node_id={{.NodeID}}"
-	ping              = "/v1/users/whoami.xml"
+	recovery                  = "/v1/{{.Producer}}/recovery/initiate_request?after={{.Timestamp}}&request_id={{.RequestID}}"
+	recoveryNode              = "/v1/{{.Producer}}/recovery/initiate_request?after={{.Timestamp}}&request_id={{.RequestID}}&node_id={{.NodeID}}"
+	fullRecovery              = "/v1/{{.Producer}}/recovery/initiate_request?request_id={{.RequestID}}"
+	fullRecoveryNode          = "/v1/{{.Producer}}/recovery/initiate_request?request_id={{.RequestID}}&node_id={{.NodeID}}"
+	recoveryEventNode         = "/v1/{{.Producer}}/odds/events/{{.EventURN}}/initiate_request?request_id={{.RequestID}}&node_id={{.NodeID}}"
+	recoveryStatefulEventNode = "/v1/{{.Producer}}/stateful_messages/events/{{.EventURN}}/initiate_request?request_id={{.RequestID}}&node_id={{.NodeID}}"
+	ping                      = "/v1/users/whoami.xml"
 )
 
 func (a *API) RequestRecovery(producer uof.Producer, timestamp int, requestID int) error {
@@ -119,12 +120,12 @@ func (a *API) RequestSportEventRecovery(producer uof.Producer, eventURN uof.URN,
 	return a.post(recoveryEventNode, &params{EventURN: eventURN, Producer: producer, RequestID: requestID, NodeID: a.nodeID})
 }
 
-// // RecoverStatefulForSportEvent requests to resend all stateful-messages
-// // (BetSettlement, RollbackBetSettlement, BetCancel, UndoBetCancel) for a sport
-// // event.
-// func (a *Api) RecoverStatefulForSportEvent(product, eventID string) error {
-// 	return a.post(fmt.Sprintf("/v1/%s/stateful_messages/events/%s/initiate_request", product, eventID))
-// }
+// RecoverStatefulForSportEvent requests to resend all stateful-messages
+// (BetSettlement, RollbackBetSettlement, BetCancel, UndoBetCancel) for a sport
+// event.
+func (a *API) RecoverStatefulForSportEvent(producer uof.Producer, eventURN uof.URN, requestID int) error {
+	return a.post(recoveryStatefulEventNode, &params{EventURN: eventURN, Producer: producer, RequestID: requestID, NodeID: a.nodeID})
+}
 
 func (a *API) Ping() error {
 	_, err := a.get(ping, nil)
