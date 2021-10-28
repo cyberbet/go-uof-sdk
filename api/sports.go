@@ -12,6 +12,7 @@ const (
 	pathMarketVariant = "/v1/descriptions/{{.Lang}}/markets/{{.MarketID}}/variants/{{.Variant}}?include_mappings={{.IncludeMappings}}"
 	pathFixture       = "/v1/sports/{{.Lang}}/sport_events/{{.EventURN}}/fixture.xml"
 	pathSummary       = "/v1/sports/{{.Lang}}/sport_events/{{.EventURN}}/summary.xml"
+	pathTimeline      = "/v1/sports/{{.Lang}}/sport_events/{{.EventURN}}/timeline.xml"
 	pathPlayer        = "/v1/sports/{{.Lang}}/players/sr:player:{{.PlayerID}}/profile.xml"
 	pathCompetitor    = "/v1/sports/{{.Lang}}/competitors/sr:competitor:{{.PlayerID}}/profile.xml"
 	events            = "/v1/sports/{{.Lang}}/schedules/pre/schedule.xml?start={{.Start}}&limit={{.Limit}}"
@@ -49,6 +50,12 @@ func (a *API) Summary(lang uof.Lang, eventURN uof.URN) (*uof.Summary, error) {
 		return &s, a.getAs(&s, replaySummary, &params{Lang: lang, EventURN: eventURN})
 	}
 	return &s, a.getAs(&s, pathSummary, &params{Lang: lang, EventURN: eventURN})
+}
+
+// Match timeline (live data)
+func (a *API) Timeline(lang uof.Lang, eventURN uof.URN) (*uof.MatchTimeline, error) {
+	var s uof.MatchTimeline
+	return &s, a.getAs(&s, pathTimeline, &params{Lang: lang, EventURN: eventURN})
 }
 
 func (a *API) Tournament(lang uof.Lang, eventURN uof.URN) (*uof.FixtureTournament, error) {

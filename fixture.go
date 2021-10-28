@@ -208,6 +208,97 @@ type Summary struct {
 	SummaryEventStatus *SummaryEventStatus `xml:"sport_event_status,omitempty" json:"summaryEventStatus,omitempty"`
 }
 
+type MatchTimeline struct {
+	SportEvent       Fixture          `xml:"sport_event" json:"sportEvent"`
+	GeneratedAt      time.Time        `xml:"generated_at,attr,omitempty" json:"generatedAt,omitempty"`
+	SportEventStatus SportEventStatus `xml:"sport_event_status" json:"sportEventStatus,omitempty"`
+	Events           []TimelineEvent  `xml:"timeline>event" json:"events,omitempty"`
+	//SportEventConditions struct {
+	//	Text  string `xml:",chardata"`
+	//	Venue struct {
+	//		Text           string `xml:",chardata"`
+	//		ID             string `xml:"id,attr"`
+	//		Name           string `xml:"name,attr"`
+	//		Capacity       string `xml:"capacity,attr"`
+	//		CityName       string `xml:"city_name,attr"`
+	//		CountryName    string `xml:"country_name,attr"`
+	//		MapCoordinates string `xml:"map_coordinates,attr"`
+	//		CountryCode    string `xml:"country_code,attr"`
+	//	} `xml:"venue"`
+	//} `xml:"sport_event_conditions"`
+}
+
+type TimelineEvent struct {
+	ID              string     `xml:"id,attr"  json:"id,omitempty"`
+	Type            string     `xml:"type,attr" json:"type,omitempty"`
+	Time            time.Time  `xml:"time,attr" json:"time,omitempty"`
+	Period          string     `xml:"period,attr" json:"period,omitempty"`
+	PeriodName      string     `xml:"period_name,attr" json:"periodName,omitempty"`
+	MatchStatusCode string     `xml:"match_status_code,attr" json:"matchStatusCode,omitempty"`
+	MatchTime       string     `xml:"match_time,attr" json:"matchTime,omitempty"`
+	MatchClock      string     `xml:"match_clock,attr" json:"matchClock,omitempty"`
+	Team            string     `xml:"team,attr" json:"team,omitempty"`
+	X               string     `xml:"x,attr" json:"x,omitempty"`
+	Y               string     `xml:"y,attr" json:"y,omitempty"`
+	HomeScore       string     `xml:"home_score,attr" json:"homeScore,omitempty"`
+	AwayScore       string     `xml:"away_score,attr" json:"awayScore,omitempty"`
+	GoalScorer      GoalScorer `xml:"goal_scorer" json:"goalScorer,omitempty"`
+	Assist          Assist     `xml:"assist" json:"assist,omitempty"`
+}
+
+type GoalScorer struct {
+	ID   string `xml:"id,attr" json:"id,omitempty"`
+	Name string `xml:"name,attr" json:"name,omitempty"`
+}
+
+type Assist struct {
+	ID   string `xml:"id,attr" json:"id,omitempty"`
+	Name string `xml:"name,attr" json:"name,omitempty"`
+	Type string `xml:"type,attr" json:"type,omitempty"`
+}
+
+//type Statistics struct {
+//	Text   string `xml:",chardata"`
+//	Totals struct {
+//		Text  string `xml:",chardata"`
+//		Teams struct {
+//			Text string `xml:",chardata"`
+//			Team []struct {
+//				Text       string `xml:",chardata"`
+//				ID         string `xml:"id,attr"`
+//				Name       string `xml:"name,attr"`
+//				Statistics struct {
+//					Text        string `xml:",chardata"`
+//					Cards       string `xml:"cards,attr"`
+//					CornerKicks string `xml:"corner_kicks,attr"`
+//					YellowCards string `xml:"yellow_cards,attr"`
+//				} `xml:"statistics"`
+//			} `xml:"team"`
+//		} `xml:"teams"`
+//	} `xml:"totals"`
+//	Periods struct {
+//		Text   string `xml:",chardata"`
+//		Period []struct {
+//			Text  string `xml:",chardata"`
+//			Name  string `xml:"name,attr"`
+//			Teams struct {
+//				Text string `xml:",chardata"`
+//				Team []struct {
+//					Text       string `xml:",chardata"`
+//					ID         string `xml:"id,attr"`
+//					Name       string `xml:"name,attr"`
+//					Statistics struct {
+//						Text        string `xml:",chardata"`
+//						Cards       string `xml:"cards,attr"`
+//						CornerKicks string `xml:"corner_kicks,attr"`
+//						YellowCards string `xml:"yellow_cards,attr"`
+//					} `xml:"statistics"`
+//				} `xml:"team"`
+//			} `xml:"teams"`
+//		} `xml:"period"`
+//	} `xml:"periods"`
+//}
+
 // slici na sport_event_status ali statusi nisu int nego string
 type SummaryEventStatus struct {
 	Status       string        `xml:"status,attr" json:"status"`
