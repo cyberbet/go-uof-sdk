@@ -209,10 +209,10 @@ type Summary struct {
 }
 
 type MatchTimeline struct {
-	SportEvent       Fixture          `xml:"sport_event" json:"sportEvent"`
-	GeneratedAt      time.Time        `xml:"generated_at,attr,omitempty" json:"generatedAt,omitempty"`
-	SportEventStatus SportEventStatus `xml:"sport_event_status" json:"sportEventStatus,omitempty"`
-	Events           []TimelineEvent  `xml:"timeline>event" json:"events,omitempty"`
+	SportEvent  Fixture   `xml:"sport_event" json:"sportEvent"`
+	GeneratedAt time.Time `xml:"generated_at,attr,omitempty" json:"generatedAt,omitempty"`
+	//SportEventStatus SportEventStatus `xml:"sport_event_status" json:"sportEventStatus,omitempty"`
+	Events []TimelineEvent `xml:"timeline>event" json:"events,omitempty"`
 	//SportEventConditions struct {
 	//	Text  string `xml:",chardata"`
 	//	Venue struct {
