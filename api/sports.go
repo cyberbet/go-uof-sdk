@@ -10,6 +10,7 @@ import (
 const (
 	pathMarkets       = "/v1/descriptions/{{.Lang}}/markets.xml?include_mappings={{.IncludeMappings}}"
 	pathMarketVariant = "/v1/descriptions/{{.Lang}}/markets/{{.MarketID}}/variants/{{.Variant}}?include_mappings={{.IncludeMappings}}"
+	pathMatchStatuses = "/v1/descriptions/{{.Lang}}/match_status.xml"
 	pathFixture       = "/v1/sports/{{.Lang}}/sport_events/{{.EventURN}}/fixture.xml"
 	pathSummary       = "/v1/sports/{{.Lang}}/sport_events/{{.EventURN}}/summary.xml"
 	pathTimeline      = "/v1/sports/{{.Lang}}/sport_events/{{.EventURN}}/timeline.xml"
@@ -25,6 +26,12 @@ const (
 func (a *API) Markets(lang uof.Lang) (uof.MarketDescriptions, error) {
 	var mr marketsRsp
 	return mr.Markets, a.getAs(&mr, pathMarkets, &params{Lang: lang})
+}
+
+// MatchStatuses fetches all available for a language
+func (a *API) MatchStatuses(lang uof.Lang) (uof.MatchStatusDescriptions, error) {
+	var mr matchStatusResponse
+	return mr.MatchStatusDescriptions, a.getAs(&mr, pathMatchStatuses, &params{Lang: lang})
 }
 
 func (a *API) MarketVariant(lang uof.Lang, marketID int, variant string) (uof.MarketDescriptions, error) {
@@ -78,6 +85,13 @@ func (a *API) Competitor(lang uof.Lang, playerID int) (*uof.CompetitorPlayer, er
 
 type marketsRsp struct {
 	Markets uof.MarketDescriptions `xml:"market,omitempty" json:"markets,omitempty"`
+	// unused
+	// ResponseCode string   `xml:"response_code,attr,omitempty" json:"responseCode,omitempty"`
+	// Location     string   `xml:"location,attr,omitempty" json:"location,omitempty"`
+}
+
+type matchStatusResponse struct {
+	MatchStatusDescriptions uof.MatchStatusDescriptions `xml:"match_status,omitempty" json:"match_status,omitempty"`
 	// unused
 	// ResponseCode string   `xml:"response_code,attr,omitempty" json:"responseCode,omitempty"`
 	// Location     string   `xml:"location,attr,omitempty" json:"location,omitempty"`
