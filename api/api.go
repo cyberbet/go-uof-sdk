@@ -15,8 +15,9 @@ import (
 )
 
 const (
-	stagingServer    = "stgapi.betradar.com"
-	productionServer = "api.betradar.com"
+	stagingServer          = "stgapi.betradar.com"
+	productionServer       = "api.betradar.com"
+	productionServerGlobal = "global.api.betradar.com"
 )
 
 var RequestTimeout = 32 * time.Second
@@ -27,6 +28,7 @@ type API struct {
 	token   string
 	exitSig context.Context
 	nodeID  int
+	client  *retryablehttp.Client
 }
 
 // Dial connect to the staging or production api environment
@@ -38,6 +40,8 @@ func Dial(ctx context.Context, env uof.Environment, token string, nodeID int) (*
 		return Staging(ctx, token, nodeID)
 	case uof.Production:
 		return Production(ctx, token, nodeID)
+	case uof.ProductionGlobal:
+		return ProductionGlobal(ctx, token, nodeID)
 	default:
 		return nil, uof.Notice("queue dial", fmt.Errorf("unknown environment %d", env))
 	}
@@ -75,6 +79,27 @@ func Production(exitSig context.Context, token string, nodeID int) (*API, error)
 		token:   token,
 		exitSig: exitSig,
 		nodeID:  nodeID,
+	}
+	return a, a.Ping()
+}
+
+func client() *retryablehttp.Client {
+	c := retryablehttp.NewClient()
+	c.Logger = nil
+	c.RetryWaitMin = 1 * time.Second
+	c.RetryWaitMax = 16 * time.Second
+	c.RetryMax = 4
+	return c
+}
+
+// Production connects to the production system
+func ProductionGlobal(exitSig context.Context, token string, nodeID int) (*API, error) {
+	a := &API{
+		server:  productionServerGlobal,
+		token:   token,
+		exitSig: exitSig,
+		nodeID:  nodeID,
+		client:  client(),
 	}
 	return a, a.Ping()
 }
