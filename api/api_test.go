@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/minus5/go-uof-sdk"
 	"github.com/stretchr/testify/assert"
 )
@@ -131,4 +132,42 @@ func pp(o interface{}) {
 		panic(err)
 	}
 	fmt.Printf("%s\n", buf)
+}
+
+func Test_ProbabilitiesEvent(t *testing.T) {
+
+	t.Skip()
+
+	api, err := Production(context.TODO(), "MOCK", 223)
+	if err != nil {
+		panic(err)
+	}
+
+	cashout, err := api.ProbabilitiesEvent(uof.URN("sr:match:37516983"))
+	if err != nil {
+		panic(err)
+	}
+
+	spew.Dump(err, cashout)
+
+	t.Error("MOCK")
+}
+
+func Test_ProbabilitiesMarket(t *testing.T) {
+
+	t.Skip()
+
+	api, err := Production(context.TODO(), "MOCK", 223)
+	if err != nil {
+		panic(err)
+	}
+
+	cashout, err := api.ProbabilitiesEventMarket(uof.URN("sr:match:37516983"), 312)
+	if err != nil {
+		panic(err)
+	}
+
+	spew.Dump(err, cashout)
+
+	t.Error("MOCK")
 }

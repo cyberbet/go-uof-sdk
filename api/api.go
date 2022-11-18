@@ -162,6 +162,7 @@ func (a *API) getAs(o interface{}, tpl string, p *params) error {
 	if err != nil {
 		return err
 	}
+
 	if err := xml.Unmarshal(buf, o); err != nil {
 		return uof.Notice("unmarshal", err)
 	}
@@ -208,6 +209,7 @@ func (a *API) httpRequest(tpl string, p *params, method string) ([]byte, error) 
 	req.Header.Set("x-access-token", a.token)
 	resp, err := client.Do(req)
 	if err != nil {
+
 		return nil, uof.E("client.Do", uof.APIError{URL: url, Inner: err})
 	}
 
